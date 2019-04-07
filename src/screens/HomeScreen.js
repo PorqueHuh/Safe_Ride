@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import { Button } from '../components/Button';
+import MapView from 'react-native-maps';
 
 
 
@@ -19,16 +20,26 @@ export default class HomeScreen extends Component {
     };
 
     render() {
-        return (
+        /*return (
         <View style={styles.container}>
             <Text>Welcome user!</Text>
             <Text>What do you want to do?</Text>
         </View>
-        );
+        );*/
+        return <MapView style = {styles.map}
+            initialRegion = {{
+                latitude: 13.139238380834923,
+                longitude: 80.25188422300266,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+                }}/>;
     }
 }
-
 const styles = {
+    map: {
+        height: 100,
+        flex: 1
+    },
     container: {
         flex: 1,
         alignItems: 'center',
