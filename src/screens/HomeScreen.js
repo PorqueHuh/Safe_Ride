@@ -43,7 +43,7 @@ const styles = {
         paddingBottom: 10
     },
     buttonView: {
- 
+
         flexDirection: 'row',
 
     },
