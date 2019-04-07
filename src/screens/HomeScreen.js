@@ -11,6 +11,7 @@ state = {
 };
 
     static navigationOptions = {
+        title: 'Home',
         headerStyle: {
             backgroundColor: 'red',
           },
