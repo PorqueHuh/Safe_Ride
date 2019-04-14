@@ -6,8 +6,7 @@ import Dialog from "react-native-dialog";
 
 export default class HomeScreen extends Component {
 state = {
-    dialogVisible1: false,
-    dialogVisible2: false
+    dialogVisible: false,
 };
 
     static navigationOptions = {
@@ -24,33 +23,23 @@ state = {
     };
 
     showDialog = () => {
-        this.setState({ dialogVisible1: true });
-    }
+        this.setState({ dialogVisible: true });
+    };
+
+    hideDialog = () => {
+        this.setState({ dialogVisible: false})
+    };
 
     handleYes = () => {
-        this.setState({ dialogVisible1: false });
-    }
+        this.setState({ dialogVisible: false });
+    };
 
     handleNo = () => {
-        this.setState({ dialogVisible1: false});
+        this.setState({ dialogVisible: false});
     };
     handleUpdate = () => {
-        this.setState({ dialogVisible1: false });
-    }
-    addCommentDialog = () => {
-        this.setState({ dialogVisible2: true });
-        <View>
-            <TouchableOpacity onPress={this.showDialog}>
-                    <Text>Add Comments</Text>
-                </TouchableOpacity>
-                <Dialog.Container visible={this.state.dialogVisible2}>
-                    <Dialog.Title>Confirm Destination</Dialog.Title>
-                    <Dialog.Description>Add comments for the drivers</Dialog.Description>
-                    <Dialog.Input label="Comments"></Dialog.Input>
-                    <Dialog.Button label="Confirm" onPress={this.handleNoLocation} />
-                </Dialog.Container>
-        </View>
-    }
+        this.setState({ dialogVisible: false });
+    };
 
     render() {
         return (
@@ -64,12 +53,12 @@ state = {
                     <Text>Confirm</Text>
                 </TouchableOpacity>
                 <Dialog.Container visible={this.state.dialogVisible}>
-                    <Dialog.Title>Confirm Destination</Dialog.Title>
-                    <Dialog.Description>Destination is correct?.</Dialog.Description>
-                    <Dialog.Button label="Yes" onPress={this.addCommentDialog} />
-                    <Dialog.Button label="No" onPress={this.handleNo} />
-                    <Dialog.Button label="Update" onPress={this.handleUpdate} />
-                </Dialog.Container>
+        <Dialog.Title>Confirm Destination</Dialog.Title>
+        <Dialog.Description>Destination is correct?.</Dialog.Description>
+        <Dialog.Button label="Yes" onPress={this.handleYes} />
+        <Dialog.Button label="No" onPress={this.handleNo} />
+        <Dialog.Button label="Update" onPress={this.handleUpdate} />
+    </Dialog.Container>
         </View>
         </View>
         );
