@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Platform, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
-import { Button } from '../components/Button';
 import Dialog from "react-native-dialog";
 
 
@@ -70,21 +69,5 @@ const styles = {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'space-around',
-    },
-    textStyle: {
-        alignSelf: 'center',
-        color: 'white',
-        fontSize: 12,
-        fontWeight: 'bold',
-        paddingTop: 10,
-        paddingBottom: 10
-    },
-    buttonView: {
- 
-        flexDirection: 'row',
-
-    },
-    managerButtonView: {
-        justifyContent: 'flex-end',
     }
 }
