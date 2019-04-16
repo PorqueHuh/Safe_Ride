@@ -6,11 +6,20 @@ import MapView from 'react-native-maps';
 
 
 export default class HomeScreen extends Component {
+    constructor(props){
+        super(props);
+    
+        this.state = {
+            latitude : null,
+            longitude : null,
+            error: null,
+        };
+    }
     static navigationOptions = {
         title: 'Home',
         headerStyle: {
             backgroundColor: 'red',
-          },
+        },
         headerTintColor: '#F2F2F2',
         headerTitleStyle: {
             flex: 1,
@@ -19,20 +28,38 @@ export default class HomeScreen extends Component {
         },
     };
 
+    componentDidMount() {
+    navigator.geolocation.getCurrentPosition(
+       (position) => {
+         console.log("test");
+         console.log(position);
+         this.setState({
+           latitude: position.coords.latitude,
+           longitude: position.coords.longitude,
+           error: null,
+         });
+        },
+        (error) => this.setState({ error: error.message }),
+        { enableHighAccuracy: false, timeout: 200000, maximumAge: 1000 },
+        );
+    }
     render() {
-        /*return (
-        <View style={styles.container}>
-            <Text>Welcome user!</Text>
-            <Text>What do you want to do?</Text>
-        </View>
-        );*/
-        return <MapView style = {styles.map}
-            initialRegion = {{
-                latitude: 13.139238380834923,
-                longitude: 80.25188422300266,
-                latitudeDelta: 0.0922,
-                longitudeDelta: 0.0421,
-                }}/>;
+    return (
+      <MapView style={styles.map} initialRegion={{
+       latitude:36.0729399,
+       longitude:-94.165265,
+       latitudeDelta: 0.5,
+       longitudeDelta: 0.5
+      }}>
+      
+      {!!this.state.latitude && !!this.state.longitude && <MapView.Marker
+         coordinate={{  "latitude":this.state.latitude,
+                        "longitude":this.state.longitude}}
+         title={"Your Location"}
+       />}
+
+       </MapView>
+      );
     }
 }
 const styles = {
