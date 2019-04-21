@@ -14,23 +14,36 @@ export default class Login extends Component {
 
   constructor(props) {
       super(props);
-      this.studentRef = firebase.firestore().collection('students');
-      this.unsubscribe = null;
+      //this.studentRef = firebase.firestore().collection('students');
+      //this.unsubscribe = null;
       this.state = {
-          students: [],
-          loading: true
+          loading: true,
       }
   }
 
-  componentDidMount() {
-    this.unsubscribe = this.studentRef.onSnapshot(this.onCollectionUpdate)
+  checkIfStudentExist = ()  => {
+    const db = firebase.firestore();
+    //010222111
+    const studentRef = db.collection('students').doc(this.state.ID);
+    this.props.navigation.navigate('App');
+    studentRef.get().then(function(doc) {
+        if(doc.exists) {
+            console.log(doc.data());
+            //this.props.navigation.navigate('App');
+            
+        } else {
+            console.log("No student exist");
+        }
+    }).catch(function(error) {
+        console.log("Error getting document: ", error);
+    });
   }
 
-  componentWillUnmount() {
+/*   componentWillUnmount() {
       this.unsubscribe();
-  }
+  } */
 
-  onCollectionUpdate = (querySnapshot) => {
+/*   onCollectionUpdate = (querySnapshot) => {
       const students = [];
 
       querySnapshot.forEach((doc) => {
@@ -47,23 +60,28 @@ export default class Login extends Component {
           students,
           loading: false,
       });
-  }
+  } */
 
   state = {
     ID: '',
   };
 
+  loginToApp = () => {
+    console.log('Login in');
+    this.props.navigation.navigate('App');
+  }
+
     render() {
-        if(this.state.loading) {
+/*         if(this.state.loading) {
             return (
                 <Spinner></Spinner>
             )
-        }
+        } */
         return (
             <View style={styles.container}>
                 <Image source={require('./img/Logo.png')} style={{flex: 1, alignSelf: 'center', height: 200, width: 200}} resizeMode="contain" />
                 <TextInput style={styles.User} placeholder="Student ID" onChangeText={(value) => this.setState({ID: value})}/>
-                <Button color="#ffffff" onPress={() => { this.props.navigation.navigate('App'); }}>
+                <Button color="#ffffff" onPress={() => { this.checkIfStudentExist(); }}>
                     {'Login'}
                 </Button>
                 <View style={{flex: 1}}/>
