@@ -23,13 +23,15 @@ export default class Login extends Component {
 
   checkIfStudentExist = ()  => {
     const db = firebase.firestore();
+    var found = false;
     //010222111
     const studentRef = db.collection('students').doc(this.state.ID);
-    this.props.navigation.navigate('App');
+    //this.props.navigation.navigate('App');
     studentRef.get().then(function(doc) {
         if(doc.exists) {
             console.log(doc.data());
-            //this.props.navigation.navigate('App');
+            found = true;
+            console.log(found);
             
         } else {
             console.log("No student exist");
@@ -37,6 +39,11 @@ export default class Login extends Component {
     }).catch(function(error) {
         console.log("Error getting document: ", error);
     });
+    console.log('2' +found);
+    if(found)
+    {
+        this.props.navigation.navigate('App');   
+    }
   }
 
 /*   componentWillUnmount() {
