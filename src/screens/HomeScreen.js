@@ -70,7 +70,6 @@ export default class HomeScreen extends Component {
     render() {
     return (
         <View style={{flex:1, backgroundColor: '#f3f3f3'}}>
-            //MapView renders the map
             <MapView style={styles.map} initialRegion={{
             latitude:36.0729399,
             longitude:-94.165265,
@@ -86,7 +85,6 @@ export default class HomeScreen extends Component {
 
             </MapView>
         
-            /This renders the button
             <View>
                 <TouchableOpacity style = {styles.button} onPress={this.showDialog}>
                 <Text>Confirm</Text>
