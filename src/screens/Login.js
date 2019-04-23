@@ -14,10 +14,13 @@ export default class Login extends Component {
 
   constructor(props) {
       super(props);
-      //this.studentRef = firebase.firestore().collection('students');
-      //this.unsubscribe = null;
+      this.checkIfStudentExist = this.checkIfStudentExist.bind(this);
+      this.loginToApp = this.loginToApp.bind(this);
+
       this.state = {
-          loading: true,
+            ID: '',
+            loading: true,
+            login: false
       }
   }
 
@@ -26,6 +29,7 @@ export default class Login extends Component {
     var found = false;
     //010222111
     const studentRef = db.collection('students').doc(this.state.ID);
+
     //this.props.navigation.navigate('App');
     studentRef.get().then(function(doc) {
         if(doc.exists) {
@@ -39,11 +43,7 @@ export default class Login extends Component {
     }).catch(function(error) {
         console.log("Error getting document: ", error);
     });
-    console.log('2' +found);
-    if(found)
-    {
-        this.props.navigation.navigate('App');   
-    }
+
   }
 
 /*   componentWillUnmount() {
@@ -69,14 +69,12 @@ export default class Login extends Component {
       });
   } */
 
-  state = {
-    ID: '',
-  };
 
   loginToApp = () => {
     console.log('Login in');
     this.props.navigation.navigate('App');
   }
+
 
     render() {
 /*         if(this.state.loading) {
@@ -88,7 +86,7 @@ export default class Login extends Component {
             <View style={styles.container}>
                 <Image source={require('./img/Logo.png')} style={{flex: 1, alignSelf: 'center', height: 200, width: 200}} resizeMode="contain" />
                 <TextInput style={styles.User} placeholder="Student ID" onChangeText={(value) => this.setState({ID: value})}/>
-                <Button color="#ffffff" onPress={() => { this.checkIfStudentExist(); }}>
+                <Button color="#ffffff" onPress={() => { this.checkIfStudentExist();}}>
                     {'Login'}
                 </Button>
                 <View style={{flex: 1}}/>
