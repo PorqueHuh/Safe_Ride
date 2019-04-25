@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Platform, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
-import { Button } from '../components/Button';
 import MapView from 'react-native-maps'; //"npm install --save react-native-maps"
 import Dialog from 'react-native-dialog'; //"npm install --save react-native-dialog"
 import firebase from 'firebase'; //npm install firebase@5.0.3 --save
@@ -23,7 +22,7 @@ export default class HomeScreen extends Component {
             location: 'Grove Street',
             name: 'Carl Johnson',
             phone: '4790001122',
-            confirmButton: true
+            confirmButton: true,
         };
     }
     static navigationOptions = {
@@ -62,10 +61,10 @@ export default class HomeScreen extends Component {
                     location
                 });
             });
-            console.log("Request: " +doc.date());
+            console.log("Request: " +doc.data());
         }).catch((error) => {
             console.log('Doc doesnt exist, creating one');
-            firestore.collection('test').add({
+            firestore.collection('test').doc(this.state.id).set({
                 id: this.state.id,
             }).then(function() {
                 console.log('New doc sucessfully created');
@@ -116,22 +115,23 @@ export default class HomeScreen extends Component {
                         id: this.state.id,
                         location: this.state.location,
                         name: this.state.name,
-                        phone: this.state.phone
+                        phone: this.state.phone,
+                        accepted: 'pending',
+                        reason: ''
                     }).then(function() {
                         console.log('Successful Request');
                     });
                 }
             });
         });
-        this.setState({cancel: true})
-
+        this.setState({confirmButton: false });
     }
 
     renderConfirmButton = (props) => {
         return (
             <View>
                 <TouchableOpacity style = {styles.button} onPress={this.showDialog}>
-                <Text>Confirm</Text>
+                <Text>Confirm Request</Text>
                 </TouchableOpacity>
                 <Dialog.Container visible={this.state.dialogVisible}>
                 <Dialog.Title>Confirm Destination</Dialog.Title>
@@ -145,6 +145,18 @@ export default class HomeScreen extends Component {
             </View>
         )
     }
+
+    cancelRequest = () => {
+        const firestore = firebase.firestore();
+        firestore.collection('test').doc(this.state.id).delete().then(function() {
+            console.log("Request deleted");
+        }).catch(function(error) {
+            console.log("Error canceling request: " +error)
+        });
+        this.hideDialog();
+
+    }
+
 
     renderCancelButton = (props) => {
         return (
@@ -160,13 +172,10 @@ export default class HomeScreen extends Component {
             </View>
         )
     }
-    
 
-
-    render() {
-    return (
-        <View style={{flex:1, backgroundColor: '#f3f3f3'}}>
-            <MapView style={styles.map} initialRegion={{
+    renderMapView = (props) => {
+        return (
+        <MapView style={styles.map} initialRegion={{
             latitude:36.0729399,
             longitude:-94.165265,
             latitudeDelta: 0.1,
@@ -180,39 +189,35 @@ export default class HomeScreen extends Component {
             />}
 
             </MapView>
-                {this.renderConfirmButton()}
+            )
+    }
+    
+
+
+    render() {
+        if(this.state.confirmButton) {
+    return (
+        <View style={{flex:1, backgroundColor: '#f3f3f3'}}>
+            {this.renderMapView()}
+            {this.renderConfirmButton()}
         </View>
     );
+        } else {
+        return (
+            <View style={{flex:1, backgroundColor: '#f3f3f3'}}>
+            {this.renderMapView()}
+            {this.renderCancelButton()}
+        </View>
+        );
+        }
     }
 }
-
 //The styles for elements
 const styles = {
     map: {
         height: 100,
         flex: 1,
         zIndex: -1,
-    },
-    container: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'space-around',
-    },
-    textStyle: {
-        alignSelf: 'center',
-        color: 'white',
-        fontSize: 12,
-        fontWeight: 'bold',
-        paddingTop: 10,
-        paddingBottom: 10
-    },
-    buttonView: {
-        flexDirection: 'row',
-    },
-    container: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'space-around',
     },
     button: {
         fontSize: 12,
