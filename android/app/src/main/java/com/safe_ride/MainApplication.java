@@ -2,6 +2,7 @@ package com.safe_ride;
 
 import android.app.Application;
 
+import com.devfd.RNGeocoder.RNGeocoderPackage;
 import com.facebook.react.ReactApplication;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.facebook.react.ReactNativeHost;
@@ -26,7 +27,8 @@ public class MainApplication extends Application implements ReactApplication {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
             new RNGestureHandlerPackage(),
-              new MapsPackage()
+              new MapsPackage(),
+              new RNGeocoderPackage()
       );
     }
 

@@ -1,32 +1,31 @@
 import React, { Component } from 'react';
 import { Platform, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
-import { Button } from '../components/Button';
-import MapView from 'react-native-maps';
-import Dialog from 'react-native-dialog';
-import firebase from 'firebase';
+import MapView from 'react-native-maps'; //"npm install --save react-native-maps"
+import Dialog from 'react-native-dialog'; //"npm install --save react-native-dialog"
+import firebase from 'firebase'; //npm install firebase@5.0.3 --save
 import 'firebase/firestore';
+import Geocoder from 'react-native-geocoder';
+
 
 
 export default class HomeScreen extends Component {
     constructor(props){
         super(props);
-    
         this.state = {
             latitude : null,
             longitude : null,
             error: null,
             dialogConfirmVisible: false,
             dialogCareVisible: false,
-            confirmButton: true,
             ADA: false,
             comment: '',
-            accepted: 'pending',
             guest: '',
             id: '123456789',
             location: 'Grove Street',
             name: 'Carl Johnson',
             phone: '4790001122',
             reason: 'NON',
+            confirmButton: true,
         };
     }
     static navigationOptions = {
@@ -37,26 +36,13 @@ export default class HomeScreen extends Component {
         headerTintColor: '#F2F2F2',
         headerTitleStyle: {
             flex: 1,
-            zIndex: -0.5,
             fontWeight: 'bold',
             textAlign: 'center'
         },
     };
 
+
     componentDidMount() {
-    navigator.geolocation.getCurrentPosition(
-       (position) => {
-         console.log("test");
-         console.log(position);
-         this.setState({
-           latitude: position.coords.latitude,
-           longitude: position.coords.longitude,
-           error: null,
-         });
-        },
-        (error) => this.setState({ error: error.message }),
-        { enableHighAccuracy: false, timeout: 200000, maximumAge: 1000 },
-        );
 
         const firestore = firebase.firestore()
         const settings = {timestampsInSnapshots: true};
@@ -78,17 +64,35 @@ export default class HomeScreen extends Component {
                     location
                 });
             });
-            console.log("Request: " +doc.date());
+            console.log("Request: " +doc.data());
         }).catch((error) => {
             console.log('Doc doesnt exist, creating one');
-            firestore.collection('test').add({
+            firestore.collection('test').doc(this.state.id).set({
                 id: this.state.id,
             }).then(function() {
                 console.log('New doc sucessfully created');
             });
         });
+
+
+
+    navigator.geolocation.getCurrentPosition(
+       (position) => {
+         console.log(position);
+         this.setState({
+           latitude: position.coords.latitude,
+           longitude: position.coords.longitude,
+           error: null,
+         });
+        },
+        (error) => this.setState({ error: error.message }),
+        { enableHighAccuracy: false, timeout: 200000, maximumAge: 1000 },    
+        );
+    
     }
-    showDialogConfirm = () => {
+    
+
+    showConfirmDialog = () => {
         this.setState({dialogConfirmVisible: true});
     };
 
@@ -96,11 +100,7 @@ export default class HomeScreen extends Component {
         this.setState({dialogCareVisible: true});
     };
 
-    handleOK = () => {
-        this.setState({dialogCareVisible:false});
-    }
-
-    hideDialog = () => {
+    hideConfirmDialog = () => {
         this.setState({dialogConfirmVisible: false});
     };
 
@@ -112,9 +112,8 @@ export default class HomeScreen extends Component {
     handleNo = () => {
         this.setState({dialogConfirmVisible: false});
     };
-
-    handleUpdate = () => {
-        this.setState({dialogConfirmVisible: false});
+    handleOK = () => {
+        this.setState({dialogCareVisible:false});
     };
 
     sendRequest = () => {
@@ -124,23 +123,43 @@ export default class HomeScreen extends Component {
                 if(doc.data().id === this.state.id) {
                     firestore.doc('test/' + doc.id).set({
                         ADA: this.state.ADA,
-                        accepted: this.state.accepted,
                         comment: this.state.comment,
                         guests: this.state.guest,
                         id: this.state.id,
                         location: this.state.location,
                         name: this.state.name,
+                        phone: this.state.phone,
+                        accepted: 'pending',
                         reason: this.state.reason,
-                        phone: this.state.phone
                     }).then(function() {
                         console.log('Successful Request');
+                        
                     });
                 }
             });
         });
-        this.setState({cancel: true})
+        alert("You have successfully requested a ride");
+        this.setState({confirmButton: false });
+    }
 
-    };
+    renderConfirmButton = (props) => {
+        return (
+            <View>
+                <TouchableOpacity style = {styles.button1} onPress={this.showConfirmDialog}>
+                <Text>Request</Text>
+                </TouchableOpacity>
+                <Dialog.Container visible={this.state.dialogConfirmVisible}>
+                <Dialog.Title>Confirm Destination</Dialog.Title>
+                <Dialog.Description>Destination is correct?</Dialog.Description>
+                <Text>{this.state.address}</Text>
+                <Dialog.Button label="Yes" onPress={this.handleYes} />
+                <Dialog.Button label="No" onPress={this.handleNo} />
+                <Dialog.Input label="Number of guest" onChangeText={(guest) => this.setState({guest: guest})} />
+                <Dialog.Input label="Additional comments" onChangeText={(comment) => this.setState({comment: comment})} />
+                </Dialog.Container>
+            </View>
+        )
+    }
 
     cancelRequest = () => {
         const firestore = firebase.firestore();
@@ -149,31 +168,28 @@ export default class HomeScreen extends Component {
         }).catch(function(error) {
             console.log("Error canceling request: " +error)
         });
-        this.hideDialog();
-    };
-    confirmRequest = () => {
-        {this.handleYes()}
-        alert("You have successfully requested a ride")
-    };
+        this.hideConfirmDialog();
+        this.setState({confirmButton: true });
+        alert("You have cancelled your request");
+    }
 
-    renderConfirmButton = (props) => {
+
+    renderCancelButton = (props) => {
         return (
             <View>
-                <TouchableOpacity style = {styles.button1} onPress={this.showDialogConfirm}>
-                <Text>Request</Text>
+                <TouchableOpacity style = {styles.button1} onPress={this.showConfirmDialog}>
+                <Text>Cancel Request</Text>
                 </TouchableOpacity>
                 <Dialog.Container visible={this.state.dialogConfirmVisible}>
-                <Dialog.Title>Confirm Destination</Dialog.Title>
-                <Dialog.Description>Destination is correct?</Dialog.Description>
-                <Text>{this.state.address}</Text>
-                <Dialog.Button label="Yes" onPress = {this.confirmRequest} />
+                <Dialog.Description>Are you sure you want to cancel the request?</Dialog.Description>
+                <Dialog.Button label="Yes" onPress={this.cancelRequest} />
                 <Dialog.Button label="No" onPress={this.handleNo} />
-                <Dialog.Input label="Number of guest" onChangeText={(guest) => this.setState({guest: guest})} />
-                <Dialog.Input label="Additional comments" onChangeText={(comment) => this.setState({comment: comment})} />
                 </Dialog.Container>
             </View>
         )
     }
+
+
 
     renderMapView = (props) => {
         return (
@@ -194,21 +210,6 @@ export default class HomeScreen extends Component {
             )
     }
 
-    renderCancelButton = (props) => {
-        return (
-            <View>
-                <TouchableOpacity style = {styles.button} onPress={this.showDialog}>
-                <Text>Cancel Request</Text>
-                </TouchableOpacity>
-                <Dialog.Container visible={this.state.dialogVisible}>
-                <Dialog.Description>Are you sure you want to cancel the request?</Dialog.Description>
-                <Dialog.Button label="Yes" onPress={this.cancelRequest} />
-                <Dialog.Button label="No" onPress={this.handleNo} />
-                </Dialog.Container>
-            </View>
-        )
-    }
-
     renderCareCard = (props) => {
         return (
         <View>
@@ -225,21 +226,34 @@ export default class HomeScreen extends Component {
                 </Dialog.Description>
                 <Dialog.Button label = 'OK' onPress = {this.handleOK} />
                 </Dialog.Container>
+        </View>
         )
-    }
+}
+    
+
 
     render() {
+        // Geocoder.geocodePosition(this.state.latitude, this.state.longitude).then(res => {
+        // alert(res[0].formattedAddress);
+        // })
+        // .catch(error => alert(error));
         if(this.state.confirmButton) {
     return (
         <View style={{flex:1, backgroundColor: '#f3f3f3'}}>
             {this.renderMapView()}
             {this.renderConfirmButton()}
+            <View>
+            {this.renderCareCard()}
+            </View>
         </View>
     );
         } else {
         return (
             <View style={{flex:1, backgroundColor: '#f3f3f3'}}>
             {this.renderMapView()}
+            <View>
+            {this.renderCareCard()}
+            </View>
             {this.renderCancelButton()}
         </View>
         );
@@ -247,35 +261,19 @@ export default class HomeScreen extends Component {
     }
 }
 
+//The styles for elements
 const styles = {
     map: {
         height: 100,
         flex: 1,
         zIndex: -1,
     },
-    container: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'space-around',
-    },
-    textStyle: {
-        alignSelf: 'center',
-        color: 'white',
+    button: {
         fontSize: 12,
-        fontWeight: 'bold',
-        paddingTop: 10,
-        paddingBottom: 10
-    },
-    buttonView: {
-        flexDirection: 'row',
-    },
-    managerButtonView: {
-        justifyContent: 'flex-end',
-    },
-    container: {
-        flex: 1,
         alignItems: 'center',
-        justifyContent: 'space-around',
+        width: 400,
+        height: 40,
+        backgroundColor: 'transparent',
     },
     button1: {
         fontSize: 12,
@@ -287,11 +285,6 @@ const styles = {
         bottom: 0,
         width: "100%",
         height: 30
-    },
-    bottom: {
-        flex: 1,
-        justifyContent: 'flex-end',
-        marginBottom: 36,
     },
     button2: {
         backgroundColor: 'white',
@@ -305,5 +298,5 @@ const styles = {
         zIndex: 0,
         top: -650,
         right: 5,
-    },
+},
 }
