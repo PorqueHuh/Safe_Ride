@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Platform, StyleSheet, Text, View, Image, TextInput, Dimensions } from 'react-native';
+import { Platform, StyleSheet, Text, View, Image, TextInput, Dimensions, Alert } from 'react-native';
 import firebase from 'firebase';
 import 'firebase/firestore';
 import { Button } from '../components/Button';
@@ -27,54 +27,36 @@ export default class Login extends Component {
   checkIfStudentExist = ()  => {
     const db = firebase.firestore();
     var found = false;
-    //010222111
+    var self = this;
+    
+    console.log("found" +found);
+    if(this.state.ID == ''){
+        alert("Please enter ID");
+        return;
+    }
     const studentRef = db.collection('students').doc(this.state.ID);
-
-    //this.props.navigation.navigate('App');
     studentRef.get().then(function(doc) {
         if(doc.exists) {
             console.log(doc.data());
             found = true;
             console.log(found);
+            {self.loginToApp()}
             
         } else {
             console.log("No student exist");
         }
-    }).catch(function(error) {
-        console.log("Error getting document: ", error);
+    }).then(function(string) {
+        console.log(found);
     });
 
   }
 
-/*   componentWillUnmount() {
-      this.unsubscribe();
-  } */
-
-/*   onCollectionUpdate = (querySnapshot) => {
-      const students = [];
-
-      querySnapshot.forEach((doc) => {
-          const { id } = doc.data();
-          console.log(id);
-          students.push({
-              key: doc.id,
-              doc,
-              id
-          });
-      });
-
-      this.setState({
-          students,
-          loading: false,
-      });
-  } */
 
 
   loginToApp = () => {
     console.log('Login in');
     this.props.navigation.navigate('App');
   }
-
 
     render() {
 /*         if(this.state.loading) {
