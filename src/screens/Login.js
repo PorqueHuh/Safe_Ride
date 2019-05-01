@@ -39,11 +39,12 @@ export default class Login extends Component {
         if(doc.exists) {
             console.log(doc.data());
             found = true;
-            console.log(found);
             {self.loginToApp()}
             
         } else {
             console.log("No student exist");
+            alert("Incorrect ID");
+            return;
         }
     }).then(function(string) {
         console.log(found);
@@ -59,11 +60,6 @@ export default class Login extends Component {
   }
 
     render() {
-/*         if(this.state.loading) {
-            return (
-                <Spinner></Spinner>
-            )
-        } */
         return (
             <View style={styles.container}>
                 <Image source={require('./img/Logo.png')} style={{flex: 1, alignSelf: 'center', height: 200, width: 200}} resizeMode="contain" />
@@ -83,13 +79,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#9D2235',
-    },
-    welcome: {
-        fontSize: 20,
-        textAlign: 'center',
-        margin: 10,
-        color: '#ffffff',
-        flex: 0
     },
     User: {
         textAlign: 'center',
