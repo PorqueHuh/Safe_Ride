@@ -21,7 +21,7 @@ export default class HomeScreen extends Component {
             comment: '',
             guest: '',
             id: '123456789',
-            location: 'Grove Street',
+            location: '',
             name: 'Carl Johnson',
             phone: '4790001122',
             reason: 'NON',
@@ -49,7 +49,7 @@ export default class HomeScreen extends Component {
         firestore.settings(settings);
 
         const request = [];
-
+//this.state.id
         firestore.collection('test').where('id', '==', this.state.id).get().then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
                 const { name, id, guest, comment, location } = doc.data();
@@ -105,6 +105,13 @@ export default class HomeScreen extends Component {
     };
 
     handleYes = () => {
+        var pos = {
+            lat: this.state.latitude,
+            lng: this.state.longitude
+        };
+        Geocoder.geocodePosition(pos).then(res => {
+        this.setState({location: res[0].formattedAddress})
+        });
         this.sendRequest();
         this.setState({ dialogConfirmVisible: false});
     };
@@ -233,10 +240,7 @@ export default class HomeScreen extends Component {
 
 
     render() {
-        // Geocoder.geocodePosition(this.state.latitude, this.state.longitude).then(res => {
-        // alert(res[0].formattedAddress);
-        // })
-        // .catch(error => alert(error));
+        
         if(this.state.confirmButton) {
     return (
         <View style={{flex:1, backgroundColor: '#f3f3f3'}}>
