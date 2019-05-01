@@ -11,6 +11,8 @@ import Geocoder from 'react-native-geocoder';
 export default class HomeScreen extends Component {
     constructor(props){
         super(props);
+        // const {navigation} = this.props;
+        nID = this.props.navigation.state.params.nID;
         this.state = {
             latitude : null,
             longitude : null,
@@ -20,7 +22,7 @@ export default class HomeScreen extends Component {
             ADA: false,
             comment: '',
             guest: '',
-            id: '123456789',
+            id: nID,
             location: '',
             name: 'Carl Johnson',
             phone: '4790001122',
@@ -48,6 +50,22 @@ export default class HomeScreen extends Component {
         const settings = {timestampsInSnapshots: true};
         firestore.settings(settings);
 
+        var self = this;
+        const db = firebase.firestore()
+        const studentRef = db.collection('students').doc(this.state.id);
+        studentRef.get().then(function(doc) {
+        if(doc.exists) {
+            found = true;
+            self.setState ({
+                name: doc.data().name,
+                phone: doc.data().phone,
+            })
+        } else {
+            return;
+        }
+        }).then(function(string) {
+            console.log(found);
+        });
         const request = [];
 //this.state.id
         firestore.collection('test').where('id', '==', this.state.id).get().then((querySnapshot) => {
@@ -139,8 +157,7 @@ export default class HomeScreen extends Component {
                         accepted: 'pending',
                         reason: this.state.reason,
                     }).then(function() {
-                        console.log('Successful Request');
-                        
+                        console.log('Successful Request');   
                     });
                 }
             });
@@ -158,7 +175,7 @@ export default class HomeScreen extends Component {
                 <Dialog.Container visible={this.state.dialogConfirmVisible}>
                 <Dialog.Title>Confirm Destination</Dialog.Title>
                 <Dialog.Description>Destination is correct?</Dialog.Description>
-                <Text>{this.state.address}</Text>
+                <Dialog.Description>{this.state.location}</Dialog.Description>
                 <Dialog.Button label="Yes" onPress={this.handleYes} />
                 <Dialog.Button label="No" onPress={this.handleNo} />
                 <Dialog.Input label="Number of guest" onChangeText={(guest) => this.setState({guest: guest})} />
