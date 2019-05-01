@@ -4,11 +4,6 @@ import firebase from 'firebase';
 import 'firebase/firestore';
 
 export default class App extends Component {
-<<<<<<< HEAD
-  
-=======
-
->>>>>>> firebase
   // Initialize Firebase
 componentWillMount() {
   const settings = { timestampsInSnapshots: true };

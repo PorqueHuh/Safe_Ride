@@ -7,10 +7,6 @@
     "test": "jest"
   },
   "dependencies": {
-<<<<<<< HEAD
-    "@mapbox/polyline": "^1.0.0",
-=======
->>>>>>> firebase
     "firebase": "^5.0.3",
     "react": "16.6.3",
     "react-native": "0.58.5",
