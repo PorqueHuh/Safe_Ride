@@ -56,7 +56,7 @@ export default class Login extends Component {
 
   loginToApp = () => {
     console.log('Login in');
-    this.props.navigation.navigate('App');
+    this.props.navigation.navigate('HomeScreen', {ID: this.state.ID});
   }
 
     render() {

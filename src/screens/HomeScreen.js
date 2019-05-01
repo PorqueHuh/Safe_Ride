@@ -18,10 +18,11 @@ export default class HomeScreen extends Component {
             ADA: false,
             comment: '',
             guest: '',
-            id: '123456789',
-            location: 'Grove Street',
-            name: 'Carl Johnson',
-            phone: '4790001122',
+            id: '',
+            location: '',
+            name: '',
+            homeAddress: '',
+            phone: '',
             confirmButton: true,
         };
     }
@@ -44,10 +45,33 @@ export default class HomeScreen extends Component {
         const firestore = firebase.firestore()
         const settings = {timestampsInSnapshots: true};
         firestore.settings(settings);
+        console.log(this.props.navigation.getParam('ID', 'noID'));
+        var self = this;
+
+
+        const db = firebase.firestore();
+        const studentRef = db.collection('students').doc(this.props.navigation.state.params.ID);
+        studentRef.get().then(function(doc) {
+            if(doc.exists) {
+                console.log("Name"+doc.data().name);
+                found = true;
+                
+                self.setState({
+                    name: doc.data().name,
+                    phone: doc.data().phone,
+                    homeAddress: doc.data().Address
+                })
+                
+            } else {
+                console.log("No student exist");
+                return;
+            }
+        }).then(function(string) {
+            console.log(found);
+        });
 
         const request = [];
-
-        firestore.collection('test').where('id', '==', this.state.id).get().then((querySnapshot) => {
+        firestore.collection('test').where('id', '==', this.props.navigation.state.params.ID).get().then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
                 const { name, id, guest, comment, location } = doc.data();
 
@@ -64,8 +88,8 @@ export default class HomeScreen extends Component {
             console.log("Request: " +doc.data());
         }).catch((error) => {
             console.log('Doc doesnt exist, creating one');
-            firestore.collection('test').doc(this.state.id).set({
-                id: this.state.id,
+            firestore.collection('test').doc(this.props.navigation.state.params.ID).set({
+                id: this.props.navigation.state.params.ID,
             }).then(function() {
                 console.log('New doc sucessfully created');
             });
@@ -105,17 +129,18 @@ export default class HomeScreen extends Component {
 
     sendRequest = () => {
         const firestore = firebase.firestore();
-        firestore.collection('test').where('id', '==', this.state.id).get().then((snapshot) => {
+        firestore.collection('test').where('id', '==', this.props.navigation.state.params.ID).get().then((snapshot) => {
             snapshot.forEach((doc) => {
-                if(doc.data().id === this.state.id) {
+                if(doc.data().id === this.props.navigation.state.params.ID) {
                     firestore.doc('test/' + doc.id).set({
                         ADA: this.state.ADA,
                         comment: this.state.comment,
                         guests: this.state.guest,
-                        id: this.state.id,
+                        id: this.props.navigation.state.params.ID,
                         location: this.state.location,
                         name: this.state.name,
                         phone: this.state.phone,
+                        homeAddress: this.state.homeAddress,
                         accepted: 'pending',
                         reason: ''
                     }).then(function() {
